@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Modern - Découvrir</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function() {
+            // Initialisation EmailJS avec votre Public Key par défaut
+            emailjs.init("YOUR_PUBLIC_KEY");
+        })();
+    </script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        pastelBg: '#BBE1FA',     /* Bleu pastel principal */
+                        pastelLight: '#D4ECFC',  /* Bleu très clair */
+                        popOrange: '#FF7A00',    /* Orange esquimau vif */
+                        popOrangeHover: '#E06B00',
+                        stickWood: '#E2C2A4',    /* Accent bois */
+                        darkText: '#1E293B',     /* Texte sombre lisible */
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Scroll Snap & Aesthetics */
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+            background-color: #BBE1FA;
+            color: #1E293B;
+        }
+
+        /* Container for block-by-block scrolling */
+        .snap-container {
+            height: 100vh;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+        }
+
+        .snap-section {
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
+            height: 100vh;
+            width: 100%;
+            position: relative;
+        }
+
+        /* Glassmorphism adapté sur fond bleu clair */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.45);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+
+        /* Drawer Overlay & Panel transitions */
+        .drawer-overlay, .modal-overlay {
+            transition: opacity 0.3s ease-in-out, visibility 0.3s;
+        }
+        .drawer-panel {
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Bounce indicator animation */
+        @keyframes customBounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-12px); }
+            60% { transform: translateY(-6px); }
+        }
+        .animate-bounce-slow {
+            animation: customBounce 2.5s infinite;
+        }
+
+        /* Custom scrollbar styling */
+        .snap-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        .snap-container::-webkit-scrollbar-track {
+            background: rgba(187, 225, 250, 0.6);
+        }
+        .snap-container::-webkit-scrollbar-thumb {
+            background: rgba(255, 122, 0, 0.6);
+            border-radius: 9999px;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-popOrange selection:text-white">
+
+    <!-- ================= FIXED BUTTON (Menu dépliant de droite à gauche) ================= -->
+    <div class="fixed top-6 right-6 z-50">
+        <button id="menu-toggle-btn" onclick="toggleDrawer()" class="group flex items-center gap-3 glass-panel px-5 py-3 rounded-full hover:bg-white/70 text-slate-800 transition-all duration-300 shadow-xl border border-white/60 active:scale-95" aria-label="Toggle Menu">
+            <span class="text-xs uppercase tracking-widest font-bold text-slate-700 group-hover:text-slate-900 transition-colors">Menu</span>
+            <div class="flex items-center justify-center w-8 h-8 rounded-full bg-popOrange group-hover:bg-popOrangeHover text-white shadow-inner transition-transform group-hover:rotate-180 duration-500">
+                <i id="menu-icon" class="fa-solid fa-chevron-left text-sm transition-all duration-300"></i>
+            </div>
+        </button>
+    </div>
+
+    <!-- ================= SLIDE-OUT DRAWER (Menu Dépliant) ================= -->
+    <div id="drawer-overlay" onclick="toggleDrawer()" class="drawer-overlay fixed inset-0 bg-slate-900/30 backdrop-blur-sm z-40 opacity-0 invisible pointer-events-none"></div>
+
+    <aside id="drawer-panel" class="drawer-panel fixed top-0 right-0 h-full w-full max-w-sm glass-panel bg-white/80 z-40 transform translate-x-full shadow-2xl flex flex-col justify-between p-8 border-l border-white/50 text-slate-800">
+        <div>
+            <!-- Header inside drawer -->
+            <div class="flex items-center justify-between pb-6 border-b border-slate-300/50 mt-12">
+                <h3 class="text-xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
+                    <i class="fa-solid fa-compass text-popOrange"></i> Navigation
+                </h3>
+                <span class="text-xs text-slate-600 bg-white/60 px-2.5 py-1 rounded-full border border-slate-300">Menu</span>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="mt-8 flex flex-col space-y-3">
+                <a href="#section-hero" onclick="closeDrawer()" class="flex items-center justify-between px-4 py-3 rounded-xl hover:bg-popOrange/10 text-slate-700 hover:text-popOrange font-medium transition-all group border border-transparent hover:border-popOrange/20">
+                    <span class="flex items-center gap-3"><i class="fa-solid fa-house text-slate-400 group-hover:text-popOrange text-sm"></i> Accueil</span>
+                    <i class="fa-solid fa-arrow-right text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                </a>
+                <a href="#section-projects" onclick="closeDrawer()" class="flex items-center justify-between px-4 py-3 rounded-xl hover:bg-popOrange/10 text-slate-700 hover:text-popOrange font-medium transition-all group border border-transparent hover:border-popOrange/20">
+                    <span class="flex items-center gap-3"><i class="fa-solid fa-code text-slate-400 group-hover:text-popOrange text-sm"></i> Projets</span>
+                    <i class="fa-solid fa-arrow-right text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                </a>
+                <a href="#section-skills" onclick="closeDrawer()" class="flex items-center justify-between px-4 py-3 rounded-xl hover:bg-popOrange/10 text-slate-700 hover:text-popOrange font-medium transition-all group border border-transparent hover:border-popOrange/20">
+                    <span class="flex items-center gap-3"><i class="fa-solid fa-layer-group text-slate-400 group-hover:text-popOrange text-sm"></i> Compétences</span>
+                    <i class="fa-solid fa-arrow-right text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                </a>
+                <a href="#section-contact" onclick="closeDrawer()" class="flex items-center justify-between px-4 py-3 rounded-xl hover:bg-popOrange/10 text-slate-700 hover:text-popOrange font-medium transition-all group border border-transparent hover:border-popOrange/20">
+                    <span class="flex items-center gap-3"><i class="fa-solid fa-paper-plane text-slate-400 group-hover:text-popOrange text-sm"></i> Contact</span>
+                    <i class="fa-solid fa-arrow-right text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                </a>
+            </nav>
+        </div>
+
+        <!-- Drawer Footer Info -->
+        <div class="pt-6 border-t border-slate-300/50">
+            <p class="text-xs text-slate-500 mb-4">Retrouvez-moi sur les réseaux sociaux :</p>
+            <div class="flex items-center space-x-3">
+                <a href="#" class="w-10 h-10 rounded-full bg-white hover:bg-popOrange hover:text-white flex items-center justify-center text-slate-600 transition-colors border border-slate-200 shadow-sm">
+                    <i class="fa-brands fa-github text-sm"></i>
+                </a>
+                <a href="#" class="w-10 h-10 rounded-full bg-white hover:bg-popOrange hover:text-white flex items-center justify-center text-slate-600 transition-colors border border-slate-200 shadow-sm">
+                    <i class="fa-brands fa-linkedin-in text-sm"></i>
+                </a>
+                <a href="#" class="w-10 h-10 rounded-full bg-white hover:bg-popOrange hover:text-white flex items-center justify-center text-slate-600 transition-colors border border-slate-200 shadow-sm">
+                    <i class="fa-brands fa-x-twitter text-sm"></i>
+                </a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ================= EMAILJS CONTACT MODAL ================= -->
+    <div id="contact-modal-overlay" class="modal-overlay fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 opacity-0 invisible pointer-events-none flex items-center justify-center p-4">
+        <div class="glass-panel bg-white/90 max-w-lg w-full p-6 md:p-8 rounded-3xl shadow-2xl relative border border-white/80">
+            <button onclick="toggleContactModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-slate-100 hover:bg-popOrange hover:text-white flex items-center justify-center text-slate-600 transition-colors">
+                <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+
+            <div class="mb-6">
+                <span class="text-xs uppercase tracking-widest text-popOrange font-bold">Messagerie</span>
+                <h3 class="text-2xl font-bold text-slate-800 mt-1">Envoyez-moi un message</h3>
+                <p class="text-xs text-slate-600 mt-1">Remplissez ce formulaire pour m'envoyer un e-mail directement.</p>
+            </div>
+
+            <form id="contact-form" onsubmit="sendEmail(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Votre Nom</label>
+                    <input type="text" id="user_name" name="user_name" required class="w-full px-4 py-2.5 rounded-xl bg-white/70 border border-slate-300 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-popOrange/50">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Votre E-mail</label>
+                    <input type="email" id="user_email" name="user_email" required class="w-full px-4 py-2.5 rounded-xl bg-white/70 border border-slate-300 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-popOrange/50">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Message</label>
+                    <textarea id="message" name="message" rows="4" required class="w-full px-4 py-2.5 rounded-xl bg-white/70 border border-slate-300 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-popOrange/50 resize-none"></textarea>
+                </div>
+                
+                <div id="form-status" class="text-xs font-medium text-center hidden"></div>
+
+                <button type="submit" id="submit-btn" class="w-full py-3 rounded-xl bg-popOrange hover:bg-popOrangeHover text-white font-bold text-sm transition-all shadow-lg shadow-popOrange/30 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-paper-plane text-xs"></i> Envoyer le message
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================= MAIN SNAP SCROLL CONTAINER ================= -->
+    <main class="snap-container">
+
+        <!-- ================= SECTION 1: HERO / DISCOVER ================= -->
+        <section id="section-hero" class="snap-section flex flex-col justify-between p-6 md:p-12 relative overflow-hidden bg-gradient-to-br from-[#cbe8fc] via-[#bbe1fa] to-[#a0d2f8]">
+            
+            <!-- Background Glow FX Orange Pastel -->
+            <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-popOrange/15 rounded-full blur-3xl pointer-events-none"></div>
+
+            <!-- Top Header Row: Left Profile Card ("À propos de moi") -->
+            <div class="w-full max-w-7xl mx-auto flex justify-start items-start pt-2 z-10">
+                
+                <!-- CARD: À propos de moi (Avec agrandissement & infos au hover) -->
+                <div class="glass-panel p-5 md:p-6 rounded-2xl max-w-sm md:max-w-md w-full shadow-xl transition-all duration-500 ease-out hover:scale-105 hover:shadow-2xl hover:border-popOrange hover:bg-white/70 group relative overflow-hidden">
+                    <div class="flex items-center gap-4 mb-4 pb-4 border-b border-slate-300/40">
+                        <!-- Avatar placeholder -->
+                        <div class="relative">
+                            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&amp;fit=crop&amp;w=250&amp;q=80" 
+                                 onerror="this.src='https://placehold.co/150x150/ff7a00/ffffff?text=Avatar'" 
+                                 alt="Avatar" 
+                                 class="w-14 h-14 rounded-xl object-cover ring-2 ring-popOrange/60 shadow-md group-hover:ring-popOrange group-hover:scale-110 transition-all duration-300">
+                            <span class="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-white" title="En ligne"></span>
+                        </div>
+                        
+                        <!-- Metadata: Pseudo, Travail, Âge -->
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between">
+                                <h2 class="text-xs uppercase tracking-wider text-popOrange font-bold">À propos de moi</h2>
+                                <span class="text-xs bg-white/70 text-slate-700 px-2 py-0.5 rounded border border-slate-300/60 font-medium">25 ans</span>
+                            </div>
+                            <h1 class="text-lg font-bold text-slate-800 truncate">Alexandre Dev</h1>
+                            <p class="text-xs text-slate-600 font-medium truncate flex items-center gap-1.5 mt-0.5">
+                                <i class="fa-solid fa-briefcase text-popOrange"></i> Développeur Full Stack
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <p class="text-xs md:text-sm text-slate-700 leading-relaxed font-normal">
+                        Passionné par la création d'interfaces web modernes, fluides et performantes. Spécialisé en React, Tailwind CSS et architecture logicielle.
+                    </p>
+
+                    <!-- Infos supplémentaires affichées au hover -->
+                    <div class="max-h-0 opacity-0 group-hover:max-h-48 group-hover:opacity-100 group-hover:mt-4 transition-all duration-500 ease-in-out overflow-hidden border-t border-slate-300/0 group-hover:border-slate-300/40 group-hover:pt-3">
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <div class="flex items-center gap-2 text-slate-700">
+                                <i class="fa-solid fa-location-dot text-popOrange"></i>
+                                <span>Paris, France</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-slate-700">
+                                <i class="fa-solid fa-circle-check text-emerald-600"></i>
+                                <span class="font-semibold text-emerald-700">Disponible (Freelance)</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-slate-700">
+                                <i class="fa-solid fa-graduation-cap text-popOrange"></i>
+                                <span>Bac +5 Informatique</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-slate-700">
+                                <i class="fa-solid fa-code text-popOrange"></i>
+                                <span>+5 ans d'expérience</span>
+                            </div>
+                        </div>
+
+                        <!-- Badges d'intérêt / technologies -->
+                        <div class="flex flex-wrap gap-1.5 mt-3">
+                            <span class="px-2 py-0.5 text-[10px] font-bold bg-popOrange/10 text-popOrange rounded-md border border-popOrange/20">TypeScript</span>
+                            <span class="px-2 py-0.5 text-[10px] font-bold bg-popOrange/10 text-popOrange rounded-md border border-popOrange/20">Next.js</span>
+                            <span class="px-2 py-0.5 text-[10px] font-bold bg-popOrange/10 text-popOrange rounded-md border border-popOrange/20">Node.js</span>
+                            <span class="px-2 py-0.5 text-[10px] font-bold bg-popOrange/10 text-popOrange rounded-md border border-popOrange/20">UI/UX</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Center Hero Title: "Découvrir" -->
+            <div class="my-auto text-center z-10 py-12">
+                <span class="inline-block px-4 py-1.5 rounded-full bg-popOrange/10 border border-popOrange/30 text-popOrange text-xs font-bold tracking-widest uppercase mb-4">
+                    Bienvenue
+                </span>
+                <h2 class="text-5xl md:text-7xl font-extrabold tracking-tight text-slate-800 mb-6 drop-shadow-sm">
+                    Découvrir
+                </h2>
+                <p class="text-slate-600 max-w-md mx-auto text-sm md:text-base font-normal px-4">
+                    Faites défiler pour explorer mes réalisations, mes compétences et mon univers créatif.
+                </p>
+            </div>
+
+            <!-- Bottom Arrows Indicator -->
+            <div class="w-full flex justify-center items-center pb-8 z-10">
+                <a href="#section-projects" class="flex flex-col items-center group cursor-pointer transition-transform duration-300">
+                    <span class="text-xs font-bold tracking-widest text-slate-600 uppercase mb-3 group-hover:text-popOrange transition-colors">Défiler par bloc</span>
+                    <div class="flex items-center gap-12 text-popOrange group-hover:text-popOrangeHover transition-colors animate-bounce-slow">
+                        <i class="fa-solid fa-arrow-down-long text-2xl drop-shadow"></i>
+                        <i class="fa-solid fa-arrow-down-long text-2xl drop-shadow"></i>
+                    </div>
+                </a>
+            </div>
+
+        </section>
+
+        <!-- ================= SECTION 2: PROJECTS ================= -->
+        <section id="section-projects" class="snap-section flex flex-col justify-center items-center p-6 md:p-12 bg-[#b2daf5] border-t border-white/30 relative">
+            <div class="max-w-6xl w-full mx-auto">
+                <div class="text-center mb-10">
+                    <span class="text-xs uppercase tracking-widest text-popOrange font-bold">Portfolio</span>
+                    <h2 class="text-3xl md:text-5xl font-bold text-slate-800 mt-2">Projets Récents</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Project Card 1 -->
+                    <div class="glass-panel p-5 rounded-2xl hover:border-popOrange/50 transition-all group shadow-md">
+                        <div class="h-40 rounded-xl bg-slate-200 overflow-hidden mb-4 relative">
+                            <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=600&q=80" 
+                                 onerror="this.src='https://placehold.co/600x400/ff7a00/ffffff?text=Dashboard+UI'" 
+                                 alt="Dashboard" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-800 group-hover:text-popOrange transition-colors">Plateforme Analytics</h3>
+                        <p class="text-xs text-slate-600 mt-2">Application SaaS de visualisation de données en temps réel avec graphiques interactifs.</p>
+                    </div>
+
+                    <!-- Project Card 2 -->
+                    <div class="glass-panel p-5 rounded-2xl hover:border-popOrange/50 transition-all group shadow-md">
+                        <div class="h-40 rounded-xl bg-slate-200 overflow-hidden mb-4 relative">
+                            <img src="https://images.unsplash.com/photo-1522542550221-31fd19575a2d?auto=format&fit=crop&w=600&q=80" 
+                                 onerror="this.src='https://placehold.co/600x400/ff7a00/ffffff?text=E-Commerce'" 
+                                 alt="E-Commerce" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-800 group-hover:text-popOrange transition-colors">E-Commerce Modern</h3>
+                        <p class="text-xs text-slate-600 mt-2">Boutique en ligne minimaliste intégrant Stripe et gestion dynamique des stocks.</p>
+                    </div>
+
+                    <!-- Project Card 3 -->
+                    <div class="glass-panel p-5 rounded-2xl hover:border-popOrange/50 transition-all group shadow-md">
+                        <div class="h-40 rounded-xl bg-slate-200 overflow-hidden mb-4 relative">
+                            <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80" 
+                                 onerror="this.src='https://placehold.co/600x400/ff7a00/ffffff?text=Mobile+App'" 
+                                 alt="App Mobile" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-800 group-hover:text-popOrange transition-colors">Mobile Task App</h3>
+                        <p class="text-xs text-slate-600 mt-2">Application de gestion de tâches avec synchronisation cloud et mode hors-ligne.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scroll indicator -->
+            <a href="#section-skills" class="absolute bottom-6 left-1/2 -translate-x-1/2 text-slate-500 hover:text-popOrange transition-colors">
+                <i class="fa-solid fa-chevron-down text-xl"></i>
+            </a>
+        </section>
+
+        <!-- ================= SECTION 3: SKILLS ================= -->
+        <section id="section-skills" class="snap-section flex flex-col justify-center items-center p-6 md:p-12 bg-[#bbe1fa] border-t border-white/30 relative">
+            <div class="max-w-4xl w-full mx-auto text-center">
+                <span class="text-xs uppercase tracking-widest text-popOrange font-bold">Expertise</span>
+                <h2 class="text-3xl md:text-5xl font-bold text-slate-800 mt-2 mb-10">Compétences Techniques</h2>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="glass-panel p-6 rounded-2xl flex flex-col items-center justify-center hover:bg-white/60 transition-all shadow-md">
+                        <i class="fa-brands fa-react text-4xl text-cyan-600 mb-3"></i>
+                        <span class="font-bold text-slate-800">React.js</span>
+                        <span class="text-xs text-slate-600 mt-1">Avancé</span>
+                    </div>
+
+                    <div class="glass-panel p-6 rounded-2xl flex flex-col items-center justify-center hover:bg-white/60 transition-all shadow-md">
+                        <i class="fa-brands fa-js text-4xl text-amber-500 mb-3"></i>
+                        <span class="font-bold text-slate-800">JavaScript / TS</span>
+                        <span class="text-xs text-slate-600 mt-1">Expert</span>
+                    </div>
+
+                    <div class="glass-panel p-6 rounded-2xl flex flex-col items-center justify-center hover:bg-white/60 transition-all shadow-md">
+                        <i class="fa-brands fa-css3-alt text-4xl text-sky-600 mb-3"></i>
+                        <span class="font-bold text-slate-800">Tailwind CSS</span>
+                        <span class="text-xs text-slate-600 mt-1">Expert</span>
+                    </div>
+
+                    <div class="glass-panel p-6 rounded-2xl flex flex-col items-center justify-center hover:bg-white/60 transition-all shadow-md">
+                        <i class="fa-brands fa-node-js text-4xl text-emerald-600 mb-3"></i>
+                        <span class="font-bold text-slate-800">Node.js</span>
+                        <span class="text-xs text-slate-600 mt-1">Intermédiaire</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scroll indicator -->
+            <a href="#section-contact" class="absolute bottom-6 left-1/2 -translate-x-1/2 text-slate-500 hover:text-popOrange transition-colors">
+                <i class="fa-solid fa-chevron-down text-xl"></i>
+            </a>
+        </section>
+
+        <!-- ================= SECTION 4: CONTACT ================= -->
+        <section id="section-contact" class="snap-section flex flex-col justify-center items-center p-6 md:p-12 bg-[#a0d2f8] border-t border-white/30 relative">
+            <div class="max-w-xl w-full mx-auto glass-panel p-8 rounded-3xl text-center shadow-2xl group/contact relative">
+                <i class="fa-regular fa-paper-plane text-4xl text-popOrange mb-4"></i>
+                <h2 class="text-3xl font-bold text-slate-800 mb-2">Travaillons Ensemble</h2>
+                <p class="text-sm text-slate-600 mb-6">Un projet en tête ? N'hésitez pas à me contacter pour en discuter.</p>
+
+                <div class="flex flex-col sm:flex-row gap-3 justify-center items-center">
+                    <button onclick="toggleContactModal()" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-popOrange hover:bg-popOrangeHover text-white font-bold text-sm transition-all shadow-lg shadow-popOrange/30">
+                        Envoyer un e-mail
+                    </button>
+                    <a href="#section-hero" class="w-full sm:w-auto px-6 py-3 rounded-xl glass-panel hover:bg-white/80 text-slate-800 font-bold text-sm transition-all inline-flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-user text-popOrange text-xs"></i> À propos de moi
+                    </a>
+                    <!-- Bouton "Un peu de fun" : affiché uniquement au hover sur le bloc conteneur, redirection au clic (href="/funzone") -->
+                    <a href="/funzone" class="w-full sm:w-auto opacity-0 invisible group-hover/contact:opacity-100 group-hover/contact:visible px-6 py-3 rounded-xl bg-popOrange hover:bg-popOrangeHover text-white font-bold text-sm transition-all duration-300 shadow-lg shadow-popOrange/30 inline-flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-face-smile text-xs"></i> Un peu de fun
+                    </a>
+                </div>
+            </div>
+
+            <p class="absolute bottom-6 text-xs text-slate-600 font-medium">
+                &copy; 2026 Alexandre Dev. Reproduction dynamique du schéma.
+            </p>
+        </section>
+
+    </main>
+
+    <!-- ================= JAVASCRIPT ================= -->
+    <script>
+        let isDrawerOpen = false;
+        let isContactModalOpen = false;
+
+        function toggleDrawer() {
+            isDrawerOpen = !isDrawerOpen;
+            const drawerPanel = document.getElementById('drawer-panel');
+            const drawerOverlay = document.getElementById('drawer-overlay');
+            const menuIcon = document.getElementById('menu-icon');
+
+            if (isDrawerOpen) {
+                drawerPanel.classList.remove('translate-x-full');
+                drawerPanel.classList.add('translate-x-0');
+                drawerOverlay.classList.remove('opacity-0', 'invisible', 'pointer-events-none');
+                drawerOverlay.classList.add('opacity-100', 'visible');
+                menuIcon.classList.remove('fa-chevron-left');
+                menuIcon.classList.add('fa-xmark');
+            } else {
+                closeDrawer();
+            }
+        }
+
+        function closeDrawer() {
+            isDrawerOpen = false;
+            const drawerPanel = document.getElementById('drawer-panel');
+            const drawerOverlay = document.getElementById('drawer-overlay');
+            const menuIcon = document.getElementById('menu-icon');
+
+            drawerPanel.classList.remove('translate-x-0');
+            drawerPanel.classList.add('translate-x-full');
+            drawerOverlay.classList.remove('opacity-100', 'visible');
+            drawerOverlay.classList.add('opacity-0', 'invisible', 'pointer-events-none');
+            menuIcon.classList.remove('fa-xmark');
+            menuIcon.classList.add('fa-chevron-left');
+        }
+
+        function toggleContactModal() {
+            isContactModalOpen = !isContactModalOpen;
+            const modalOverlay = document.getElementById('contact-modal-overlay');
+
+            if (isContactModalOpen) {
+                modalOverlay.classList.remove('opacity-0', 'invisible', 'pointer-events-none');
+                modalOverlay.classList.add('opacity-100', 'visible');
+            } else {
+                modalOverlay.classList.remove('opacity-100', 'visible');
+                modalOverlay.classList.add('opacity-0', 'invisible', 'pointer-events-none');
+            }
+        }
+
+        // Fonction d'envoi EmailJS
+        function sendEmail(event) {
+            event.preventDefault();
+            
+            const submitBtn = document.getElementById('submit-btn');
+            const formStatus = document.getElementById('form-status');
+            
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner animate-spin text-xs"></i> Envoi en cours...';
+            formStatus.classList.remove('hidden', 'text-emerald-600', 'text-red-600');
+            formStatus.classList.add('text-slate-600');
+            formStatus.innerText = "Envoi du message en cours...";
+
+            const SERVICE_ID = "YOUR_SERVICE_ID";
+            const TEMPLATE_ID = "YOUR_TEMPLATE_ID";
+
+            emailjs.sendForm(SERVICE_ID, TEMPLATE_ID, '#contact-form')
+                .then(function() {
+                    formStatus.classList.remove('text-slate-600', 'text-red-600');
+                    formStatus.classList.add('text-emerald-600');
+                    formStatus.innerText = "Message envoyé avec succès !";
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fa-solid fa-check text-xs"></i> Envoyé';
+                    
+                    document.getElementById('contact-form').reset();
+                    setTimeout(() => {
+                        toggleContactModal();
+                        formStatus.classList.add('hidden');
+                        submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane text-xs"></i> Envoyer le message';
+                    }, 2500);
+                }, function(error) {
+                    formStatus.classList.remove('text-slate-600', 'text-emerald-600');
+                    formStatus.classList.add('text-red-600');
+                    formStatus.innerText = "Erreur d'envoi, veuillez réessayer.";
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane text-xs"></i> Envoyer le message';
+                });
+        }
+
+        // Fermeture sur la touche Échap
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                if (isDrawerOpen) closeDrawer();
+                if (isContactModalOpen) toggleContactModal();
+            }
+        });
+    </script>
+</body>
+</html>
