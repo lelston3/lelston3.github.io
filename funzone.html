@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FunZone - Jeux & Expériences Interactives</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function() {
+            emailjs.init("YOUR_PUBLIC_KEY");
+        })();
+    </script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        pastelBg: '#BBE1FA',     /* Bleu pastel principal */
+                        pastelLight: '#D4ECFC',  /* Bleu très clair */
+                        popOrange: '#FF7A00',    /* Orange esquimau vif */
+                        popOrangeHover: '#E06B00',
+                        stickWood: '#E2C2A4',    /* Accent bois */
+                        darkText: '#1E293B',     /* Texte sombre */
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="funzone.css">
+</head>
+<body class="antialiased selection:bg-popOrange selection:text-white min-h-screen flex flex-col justify-between">
+
+    <!-- ================= FIXED BUTTON (Menu dépliant de droite à gauche) ================= -->
+    <div class="fixed top-6 right-6 z-50">
+        <button id="menu-toggle-btn" onclick="toggleDrawer()" class="group flex items-center gap-3 glass-panel px-5 py-3 rounded-full hover:bg-white/70 text-slate-800 transition-all duration-300 shadow-xl border border-white/60 active:scale-95" aria-label="Toggle Menu">
+            <span class="text-xs uppercase tracking-widest font-bold text-slate-700 group-hover:text-slate-900 transition-colors">Menu</span>
+            <div class="flex items-center justify-center w-8 h-8 rounded-full bg-popOrange group-hover:bg-popOrangeHover text-white shadow-inner transition-transform group-hover:rotate-180 duration-500">
+                <i id="menu-icon" class="fa-solid fa-chevron-left text-sm transition-all duration-300"></i>
+            </div>
+        </button>
+    </div>
+
+    <!-- ================= SLIDE-OUT DRAWER ================= -->
+    <div id="drawer-overlay" onclick="toggleDrawer()" class="drawer-overlay fixed inset-0 bg-slate-900/30 backdrop-blur-sm z-40 opacity-0 invisible pointer-events-none"></div>
+
+    <aside id="drawer-panel" class="drawer-panel fixed top-0 right-0 h-full w-full max-w-sm glass-panel bg-white/80 z-40 transform translate-x-full shadow-2xl flex flex-col justify-between p-8 border-l border-white/50 text-slate-800">
+        <div>
+            <div class="flex items-center justify-between pb-6 border-b border-slate-300/50 mt-12">
+                <h3 class="text-xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
+                    <i class="fa-solid fa-gamepad text-popOrange"></i> Navigation
+                </h3>
+                <span class="text-xs text-slate-600 bg-white/60 px-2.5 py-1 rounded-full border border-slate-300">FunZone</span>
+            </div>
+
+            <nav class="mt-8 flex flex-col space-y-3">
+                <a href="index.html" class="flex items-center justify-between px-4 py-3 rounded-xl hover:bg-popOrange/10 text-slate-700 hover:text-popOrange font-medium transition-all group border border-transparent hover:border-popOrange/20">
+                    <span class="flex items-center gap-3"><i class="fa-solid fa-house text-slate-400 group-hover:text-popOrange text-sm"></i> Accueil Portfolio</span>
+                    <i class="fa-solid fa-arrow-right text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                </a>
+                <a href="funzone.html" class="flex items-center justify-between px-4 py-3 rounded-xl bg-popOrange/15 text-popOrange font-bold transition-all border border-popOrange/30">
+                    <span class="flex items-center gap-3"><i class="fa-solid fa-ghost text-popOrange text-sm"></i> FunZone (Jeux)</span>
+                    <i class="fa-solid fa-check text-xs"></i>
+                </a>
+                <a href="index.html#section-projects" class="flex items-center justify-between px-4 py-3 rounded-xl hover:bg-popOrange/10 text-slate-700 hover:text-popOrange font-medium transition-all group border border-transparent hover:border-popOrange/20">
+                    <span class="flex items-center gap-3"><i class="fa-solid fa-code text-slate-400 group-hover:text-popOrange text-sm"></i> Projets</span>
+                    <i class="fa-solid fa-arrow-right text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                </a>
+                <a href="#" onclick="toggleContactModal(); closeDrawer(); return false;" class="flex items-center justify-between px-4 py-3 rounded-xl hover:bg-popOrange/10 text-slate-700 hover:text-popOrange font-medium transition-all group border border-transparent hover:border-popOrange/20">
+                    <span class="flex items-center gap-3"><i class="fa-solid fa-paper-plane text-slate-400 group-hover:text-popOrange text-sm"></i> Contact</span>
+                    <i class="fa-solid fa-arrow-right text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                </a>
+            </nav>
+        </div>
+
+        <div class="pt-6 border-t border-slate-300/50">
+            <p class="text-xs text-slate-500 mb-4">Suivez-moi :</p>
+            <div class="flex items-center space-x-3">
+                <a href="#" class="w-10 h-10 rounded-full bg-white hover:bg-popOrange hover:text-white flex items-center justify-center text-slate-600 transition-colors border border-slate-200 shadow-sm"><i class="fa-brands fa-github text-sm"></i></a>
+                <a href="#" class="w-10 h-10 rounded-full bg-white hover:bg-popOrange hover:text-white flex items-center justify-center text-slate-600 transition-colors border border-slate-200 shadow-sm"><i class="fa-brands fa-linkedin-in text-sm"></i></a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ================= EMAILJS CONTACT MODAL ================= -->
+    <div id="contact-modal-overlay" class="modal-overlay fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 opacity-0 invisible pointer-events-none flex items-center justify-center p-4">
+        <div class="glass-panel bg-white/90 max-w-lg w-full p-6 md:p-8 rounded-3xl shadow-2xl relative border border-white/80">
+            <button onclick="toggleContactModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-slate-100 hover:bg-popOrange hover:text-white flex items-center justify-center text-slate-600 transition-colors">
+                <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+            <div class="mb-6">
+                <span class="text-xs uppercase tracking-widest text-popOrange font-bold">Messagerie</span>
+                <h3 class="text-2xl font-bold text-slate-800 mt-1">Envoyez-moi un message</h3>
+            </div>
+            <form id="contact-form" onsubmit="sendEmail(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Votre Nom</label>
+                    <input type="text" required class="w-full px-4 py-2.5 rounded-xl bg-white/70 border border-slate-300 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-popOrange/50">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Votre E-mail</label>
+                    <input type="email" required class="w-full px-4 py-2.5 rounded-xl bg-white/70 border border-slate-300 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-popOrange/50">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Message</label>
+                    <textarea rows="4" required class="w-full px-4 py-2.5 rounded-xl bg-white/70 border border-slate-300 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-popOrange/50 resize-none"></textarea>
+                </div>
+                <button type="submit" class="w-full py-3 rounded-xl bg-popOrange hover:bg-popOrangeHover text-white font-bold text-sm transition-all shadow-lg shadow-popOrange/30 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-paper-plane text-xs"></i> Envoyer le message
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================= EN-TÊTE PAGE FUNZONE ================= -->
+    <header class="pt-12 pb-6 px-6 text-center max-w-4xl mx-auto">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-popOrange/10 border border-popOrange/30 text-popOrange text-xs font-bold tracking-widest uppercase mb-4">
+            <i class="fa-solid fa-wand-magic-sparkles text-xs"></i> Zone de Jeux & Expériences
+        </div>
+        <h1 class="text-4xl md:text-6xl font-extrabold text-slate-800 tracking-tight">
+            FunZone <span class="text-popOrange">Interactive</span>
+        </h1>
+        <p class="text-sm md:text-base text-slate-600 mt-3 max-w-xl mx-auto">
+            Liste des mini-jeux et démos graphiques disponibles. Survolez une carte pour la faire <strong>sortir de sa fente</strong> et lancer l'expérience !
+        </p>
+    </header>
+
+    <!-- ================= CONTENU PRINCIPAL (SCHÉMA: CARTES AVEC ANIMATION SORTIE DE FENTE) ================= -->
+    <main class="max-w-7xl mx-auto px-6 py-8 w-full flex-grow">
+        
+        <!-- Grille Répondant au Schéma fourni (3 cartes principales + cartes secondaires) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
+
+            <!-- GAME CARD 1: Marching Squares Fluid -->
+            <div class="slot-container group">
+                <div class="glass-panel p-6 rounded-2xl shadow-lg transition-all duration-500 transform group-hover:-translate-y-5 group-hover:shadow-2xl group-hover:border-popOrange relative bg-white/70 flex flex-col justify-between h-full">
+                    
+                    <!-- Fente visuelle d'indication -->
+                    <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-popOrange text-white text-[10px] font-bold uppercase rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300">
+                        <i class="fa-solid fa-arrow-up text-[9px] mr-1"></i> Prêt à jouer
+                    </div>
+
+                    <div>
+                        <!-- Game Thumbnail / Icon -->
+                        <div class="w-full h-44 rounded-xl bg-slate-900 overflow-hidden mb-5 relative flex items-center justify-center group-hover:ring-2 ring-popOrange/50 transition-all">
+                            <div class="absolute inset-0 bg-gradient-to-tr from-cyan-500/20 to-popOrange/20"></div>
+                            <i class="fa-solid fa-water text-5xl text-cyan-400 group-hover:scale-125 transition-transform duration-500"></i>
+                            <span class="absolute bottom-2 right-2 text-[10px] font-bold bg-slate-800/80 text-cyan-300 px-2 py-0.5 rounded border border-cyan-500/30">Canvas 2D</span>
+                        </div>
+
+                        <!-- Card Header -->
+                        <div class="flex items-center justify-between mb-2">
+                            <h2 class="text-xl font-bold text-slate-800 group-hover:text-popOrange transition-colors">Marching Squares</h2>
+                            <span class="text-xs font-semibold px-2 py-0.5 rounded bg-emerald-100 text-emerald-700">Interactif</span>
+                        </div>
+
+                        <p class="text-xs text-slate-600 leading-relaxed mb-6">
+                            Simulation de fluide organique en temps réel générée par l'algorithme des Marching Squares avec métaballes interactives à la souris.
+                        </p>
+                    </div>
+
+                    <button onclick="alert('Lancement de Marching Squares !')" class="w-full py-3 rounded-xl bg-popOrange hover:bg-popOrangeHover text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md shadow-popOrange/20 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-play text-xs"></i> Jouer la démo
+                    </button>
+                </div>
+            </div>
+
+            <!-- GAME CARD 2: Snake Neo 3D -->
+            <div class="slot-container group">
+                <div class="glass-panel p-6 rounded-2xl shadow-lg transition-all duration-500 transform group-hover:-translate-y-5 group-hover:shadow-2xl group-hover:border-popOrange relative bg-white/70 flex flex-col justify-between h-full">
+                    
+                    <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-popOrange text-white text-[10px] font-bold uppercase rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300">
+                        <i class="fa-solid fa-arrow-up text-[9px] mr-1"></i> Prêt à jouer
+                    </div>
+
+                    <div>
+                        <div class="w-full h-44 rounded-xl bg-slate-900 overflow-hidden mb-5 relative flex items-center justify-center group-hover:ring-2 ring-popOrange/50 transition-all">
+                            <div class="absolute inset-0 bg-gradient-to-tr from-emerald-500/20 to-popOrange/20"></div>
+                            <i class="fa-solid fa-staff-snake text-5xl text-emerald-400 group-hover:scale-125 transition-transform duration-500"></i>
+                            <span class="absolute bottom-2 right-2 text-[10px] font-bold bg-slate-800/80 text-emerald-300 px-2 py-0.5 rounded border border-emerald-500/30">Retro Game</span>
+                        </div>
+
+                        <div class="flex items-center justify-between mb-2">
+                            <h2 class="text-xl font-bold text-slate-800 group-hover:text-popOrange transition-colors">Snake Arcade</h2>
+                            <span class="text-xs font-semibold px-2 py-0.5 rounded bg-amber-100 text-amber-700">Arcade</span>
+                        </div>
+
+                        <p class="text-xs text-slate-600 leading-relaxed mb-6">
+                            Le serpent classique réinventé avec des effets de particules modernes, accélérations et gestion des meilleurs scores en local.
+                        </p>
+                    </div>
+
+                    <button onclick="alert('Lancement de Snake Arcade !')" class="w-full py-3 rounded-xl bg-popOrange hover:bg-popOrangeHover text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md shadow-popOrange/20 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-play text-xs"></i> Jouer la démo
+                    </button>
+                </div>
+            </div>
+
+            <!-- GAME CARD 3: Marching Cubes 3D -->
+            <div class="slot-container group">
+                <div class="glass-panel p-6 rounded-2xl shadow-lg transition-all duration-500 transform group-hover:-translate-y-5 group-hover:shadow-2xl group-hover:border-popOrange relative bg-white/70 flex flex-col justify-between h-full">
+                    
+                    <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-popOrange text-white text-[10px] font-bold uppercase rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300">
+                        <i class="fa-solid fa-arrow-up text-[9px] mr-1"></i> Prêt à jouer
+                    </div>
+
+                    <div>
+                        <div class="w-full h-44 rounded-xl bg-slate-900 overflow-hidden mb-5 relative flex items-center justify-center group-hover:ring-2 ring-popOrange/50 transition-all">
+                            <div class="absolute inset-0 bg-gradient-to-tr from-purple-500/20 to-popOrange/20"></div>
+                            <i class="fa-solid fa-cube text-5xl text-purple-400 group-hover:scale-125 transition-transform duration-500"></i>
+                            <span class="absolute bottom-2 right-2 text-[10px] font-bold bg-slate-800/80 text-purple-300 px-2 py-0.5 rounded border border-purple-500/30">Three.js 3D</span>
+                        </div>
+
+                        <div class="flex items-center justify-between mb-2">
+                            <h2 class="text-xl font-bold text-slate-800 group-hover:text-popOrange transition-colors">Marching Cubes 3D</h2>
+                            <span class="text-xs font-semibold px-2 py-0.5 rounded bg-purple-100 text-purple-700">WebGL</span>
+                        </div>
+
+                        <p class="text-xs text-slate-600 leading-relaxed mb-6">
+                            Sculpture volumétrique dynamique en 3D avec éclairage studio, matériaux réfléchissants et physique de métaballes liquides.
+                        </p>
+                    </div>
+
+                    <button onclick="alert('Lancement de Marching Cubes 3D !')" class="w-full py-3 rounded-xl bg-popOrange hover:bg-popOrangeHover text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md shadow-popOrange/20 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-play text-xs"></i> Jouer la démo
+                    </button>
+                </div>
+            </div>
+
+            <!-- CARD SECONDAIRE 4 (Rangée inférieure du schéma) -->
+            <div class="slot-container group md:col-span-1 lg:col-span-1">
+                <div class="glass-panel p-6 rounded-2xl shadow-lg transition-all duration-500 transform group-hover:-translate-y-5 group-hover:shadow-2xl group-hover:border-popOrange relative bg-white/70 flex flex-col justify-between h-full">
+                    
+                    <div>
+                        <div class="w-full h-36 rounded-xl bg-slate-900 overflow-hidden mb-4 relative flex items-center justify-center">
+                            <i class="fa-solid fa-robot text-4xl text-rose-400 group-hover:scale-110 transition-transform"></i>
+                        </div>
+                        <h2 class="text-lg font-bold text-slate-800 group-hover:text-popOrange transition-colors">Tic-Tac-Toe IA</h2>
+                        <p class="text-xs text-slate-600 mt-1 mb-4">Morpion imbattable algorithme Minimax.</p>
+                    </div>
+
+                    <button onclick="alert('Lancement Tic-Tac-Toe !')" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-popOrange text-white font-bold text-xs transition-all">
+                        Lancer
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- ================= FOOTER ================= -->
+    <footer class="p-6 text-center text-xs text-slate-600 border-t border-white/40 mt-12 glass-panel">
+        <p>&copy; 2026 Portfolio Modern - FunZone. Tous droits réservés.</p>
+    </footer>
+
+    <!-- ================= JAVASCRIPT NAVIGATION ================= -->
+    <script>
+        let isDrawerOpen = false;
+        let isContactModalOpen = false;
+
+        function toggleDrawer() {
+            isDrawerOpen = !isDrawerOpen;
+            const drawerPanel = document.getElementById('drawer-panel');
+            const drawerOverlay = document.getElementById('drawer-overlay');
+            const menuIcon = document.getElementById('menu-icon');
+
+            if (isDrawerOpen) {
+                drawerPanel.classList.remove('translate-x-full');
+                drawerPanel.classList.add('translate-x-0');
+                drawerOverlay.classList.remove('opacity-0', 'invisible', 'pointer-events-none');
+                drawerOverlay.classList.add('opacity-100', 'visible');
+                menuIcon.classList.remove('fa-chevron-left');
+                menuIcon.classList.add('fa-xmark');
+            } else {
+                closeDrawer();
+            }
+        }
+
+        function closeDrawer() {
+            isDrawerOpen = false;
+            const drawerPanel = document.getElementById('drawer-panel');
+            const drawerOverlay = document.getElementById('drawer-overlay');
+            const menuIcon = document.getElementById('menu-icon');
+
+            drawerPanel.classList.remove('translate-x-0');
+            drawerPanel.classList.add('translate-x-full');
+            drawerOverlay.classList.remove('opacity-100', 'visible');
+            drawerOverlay.classList.add('opacity-0', 'invisible', 'pointer-events-none');
+            menuIcon.classList.remove('fa-xmark');
+            menuIcon.classList.add('fa-chevron-left');
+        }
+
+        function toggleContactModal() {
+            isContactModalOpen = !isContactModalOpen;
+            const modalOverlay = document.getElementById('contact-modal-overlay');
+
+            if (isContactModalOpen) {
+                modalOverlay.classList.remove('opacity-0', 'invisible', 'pointer-events-none');
+                modalOverlay.classList.add('opacity-100', 'visible');
+            } else {
+                modalOverlay.classList.remove('opacity-100', 'visible');
+                modalOverlay.classList.add('opacity-0', 'invisible', 'pointer-events-none');
+            }
+        }
+
+        function sendEmail(event) {
+            event.preventDefault();
+            alert("Message envoyé !");
+            toggleContactModal();
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                if (isDrawerOpen) closeDrawer();
+                if (isContactModalOpen) toggleContactModal();
+            }
+        });
+    </script>
+</body>
+</html>

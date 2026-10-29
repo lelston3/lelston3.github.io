@@ -1,0 +1,45 @@
+html, body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            background-color: #BBE1FA;
+            color: #1E293B;
+        }
+
+        /* Glassmorphism identiquement à index.html */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.45);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+
+        /* Drawer & Modale transitions */
+        .drawer-overlay, .modal-overlay {
+            transition: opacity 0.3s ease-in-out, visibility 0.3s;
+        }
+        .drawer-panel {
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Effet "Fente / Insertion" de carte */
+        .slot-container {
+            position: relative;
+            background: rgba(30, 41, 59, 0.08);
+            border-bottom: 3px solid rgba(255, 122, 0, 0.4);
+            border-radius: 1.5rem;
+            padding-top: 12px;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(187, 225, 250, 0.6);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 122, 0, 0.6);
+            border-radius: 9999px;
+        }
